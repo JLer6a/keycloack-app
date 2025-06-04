@@ -24,7 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KeycloakService {
 
-    @Value("${spring.security.oauth2.client.registration.keycloak.client-secret}")
+    @Value("${keycloak.admin.client-secret}")
     private String clientSecret;
 
     private final Keycloak keycloak;

@@ -12,12 +12,20 @@ spring:
         registration:
           keycloak:
             client-id: shop-app
-            client-secret: GgAhA4dJEUeQH6Dyhf26Svz8p9Iyr2V8
-            scope: openid
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid, profile, email
+
+keycloak:
+  admin:
+    server-url: http://localhost:8082
+    realm: shop
+    client-id: shop-app
+    client-secret: rB3fiY3Ox04wXeW2YqseTp9dVJYLq7VJ
+
 server:
   port: 8081
+
 logging:
   level:
     org.springframework.security: TRACE
-
-

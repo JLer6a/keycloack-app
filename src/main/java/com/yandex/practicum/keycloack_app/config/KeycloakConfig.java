@@ -7,7 +7,6 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,17 +24,23 @@ import java.util.stream.Stream;
 @Configuration
 public class KeycloakConfig {
 
-    @Value("${spring.security.oauth2.client.registration.keycloak.client-id}")
+    @Value("${keycloak.admin.server-url}")
+    private String serverUrl;
+
+    @Value("${keycloak.admin.realm}")
+    private String realm;
+
+    @Value("${keycloak.admin.client-id}")
     private String clientId;
 
-    @Value("${spring.security.oauth2.client.registration.keycloak.client-secret}")
+    @Value("${keycloak.admin.client-secret}")
     private String clientSecret;
 
     @Bean
     public Keycloak keycloak() {
         return KeycloakBuilder.builder()
-                .serverUrl("http://localhost:8082")
-                .realm("shop")
+                .serverUrl(serverUrl)
+                .realm(realm)
                 .clientId(clientId)
                 .clientSecret(clientSecret)
                 .grantType("client_credentials")
@@ -49,16 +54,18 @@ public class KeycloakConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/error").permitAll()
-                                .requestMatchers("/register", "/login").permitAll()
-                                .requestMatchers("/manager.html").hasRole("MANAGER")
-                                .requestMatchers("/admin.html").hasRole("ADMIN")
-                                .anyRequest().authenticated())
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/register", "/login").permitAll()
+                        .requestMatchers("/manager.html").hasRole("MANAGER")
+                        .requestMatchers("/admin.html").hasRole("ADMIN")
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(resourceServer -> resourceServer
-                                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                                .authenticationEntryPoint(authEntryPoint)
-                                .accessDeniedHandler(accessDeniedHandler))
-                .oauth2Login(Customizer.withDefaults());
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(authEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/authenticated.html", true));
 
         return http.build();
     }
