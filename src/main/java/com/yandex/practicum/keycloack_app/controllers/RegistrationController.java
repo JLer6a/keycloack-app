@@ -31,9 +31,4 @@ public class RegistrationController {
                     .body("Error during registration: " + e.getMessage());
         }
     }
-
-    @GetMapping("/login")
-    public void redirectToLogin(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/oauth2/authorization/keycloak");
-    }
 }

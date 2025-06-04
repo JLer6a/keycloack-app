@@ -13,9 +13,17 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request,
                        HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException {
+                       AccessDeniedException ex) throws IOException {
+
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"Custom 403: Access denied - not enough rights\"}");
+        response.setContentType("application/json;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        response.getWriter().write("""
+            {
+              "error": "Forbidden",
+              "message": "Custom 403: Access denied - not enough rights"
+            }
+        """);
     }
 }

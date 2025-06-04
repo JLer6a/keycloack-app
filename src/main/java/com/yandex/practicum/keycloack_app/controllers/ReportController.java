@@ -1,5 +1,6 @@
 package com.yandex.practicum.keycloack_app.controllers;
 
+import com.yandex.practicum.keycloack_app.annotation.ManagerOnly;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import java.util.Random;
 public class ReportController {
 
     @GetMapping("/reports")
+    @ManagerOnly
     public ResponseEntity<Map<String, Object>> getReport() {
         Map<String, Object> report = new HashMap<>();
         report.put("date", LocalDate.now().toString());

@@ -1,6 +1,8 @@
 package com.yandex.practicum.keycloack_app.services;
 
-import com.yandex.practicum.keycloack_app.dto.*;
+import com.yandex.practicum.keycloack_app.dto.UserProfileResponse;
+import com.yandex.practicum.keycloack_app.dto.UserProfileUpdateRequest;
+import com.yandex.practicum.keycloack_app.dto.UserRegistrationRequest;
 import com.yandex.practicum.keycloack_app.exceptionhandler.EmailAlreadyUsedException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
@@ -11,14 +13,9 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +30,8 @@ public class KeycloakService {
         UsersResource usersResource = keycloak.realm("shop").users();
 
         // Проверка по email
-        List<UserRepresentation> existingUsers = usersResource.search(null, null, null, request.getEmail(), 0, 1);
+        List<UserRepresentation> existingUsers = usersResource.search(null, null, null, request.getEmail(), 0,
+                1);
         if (!existingUsers.isEmpty()) {
             throw new EmailAlreadyUsedException(request.getEmail());
         }
@@ -77,37 +75,6 @@ public class KeycloakService {
                 "http://localhost:8081/authenticated.html",
                 List.of("VERIFY_EMAIL")
                                                      );
-    }
-
-
-    public JwtResponse login(LoginRequest request) {
-        String tokenUrl = "http://localhost:8082/realms/shop/protocol/openid-connect/token";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "password");
-        params.add("client_id", "shop-app");
-        params.add("client_secret", clientSecret);
-        params.add("username", request.getUsername());
-        params.add("password", request.getPassword());
-
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, entity, Map.class);
-
-        if (response.getStatusCode() != HttpStatus.OK) {
-            throw new RuntimeException("Login failed: " + response.getStatusCode());
-        }
-
-        Map<String, Object> tokenResponse = response.getBody();
-
-        return new JwtResponse(
-                tokenResponse.get("access_token").toString(),
-                tokenResponse.get("refresh_token").toString()
-        );
     }
 
     public UserProfileResponse getUserProfile(String userId) {

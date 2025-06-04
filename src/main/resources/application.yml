@@ -13,6 +13,7 @@ spring:
           keycloak:
             client-id: shop-app
             authorization-grant-type: authorization_code
+            client-authentication-method: none    # <--- ВАЖНО! без него ЛОГИН НЕ БУДЕТ РАБОТАТЬ С PKCE
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope: openid, profile, email
 
@@ -20,8 +21,8 @@ keycloak:
   admin:
     server-url: http://localhost:8082
     realm: shop
-    client-id: shop-app
-    client-secret: rB3fiY3Ox04wXeW2YqseTp9dVJYLq7VJ
+    client-id: shop-admin
+    client-secret: uF5u38F7pMNaY7Ca8wIbtmpRTM2h1fuv
 
 server:
   port: 8081
